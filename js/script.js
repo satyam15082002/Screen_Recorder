@@ -25,7 +25,7 @@ async function handleStartRecording()
     mainVideo.onloadedmetadata=()=>mainVideo.play();
 
     mediaRecorder=new MediaRecorder(stream);
-    mediaRecorder.start();
+    mediaRecorder.start(1000);
     mediaRecorder.onstart=()=>{
         isRecording=true;
         mainVideo.classList.remove("hide");
