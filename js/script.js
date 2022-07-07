@@ -1,0 +1,86 @@
+//Control Button
+const startBtn=document.getElementById('start-button')
+const stopBtn=document.getElementById('stop-button')
+const stateBtn=document.getElementById('state-button')
+//Views Component
+const mainVideo=document.getElementById("main-video")
+const videoGrid=document.querySelector(".video-grid");
+
+var mediaRecorder;
+let chunck=[];
+let isRecording=false;
+async function handleStartRecording()
+{
+    //Set audio and video stream;
+    const videoStream=await navigator.mediaDevices.getDisplayMedia({video:true});
+    const audioStream=await navigator.mediaDevices.getUserMedia({audio:{
+        echoCancellation:true,noiseSuppression:true,sampleRate:44100
+    }})
+    if(!audioStream&&!videoStream)
+        return;
+    const stream=new MediaStream([...videoStream.getVideoTracks(),...audioStream.getAudioTracks()])
+    //Set main video stream
+    mainVideo.srcObject=stream;
+    mainVideo.muted=true;
+    mainVideo.onloadedmetadata=()=>mainVideo.play();
+
+    mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.start();
+    mediaRecorder.onstart=()=>{
+        isRecording=true;
+        mainVideo.classList.remove("hide");
+        videoGrid?.classList.add("hide");
+        if(startBtn==null||stopBtn==null||stateBtn==null) return; 
+        startBtn.disabled=true
+        stopBtn.disabled=stateBtn.disabled=false
+    }
+    mediaRecorder.onpause=()=>{
+        mainVideo.pause();
+        isRecording=false;
+        stateBtn.className="fa fa-play";
+        stateBtn.querySelector('span').textContent="Resume Recording";
+    }
+    mediaRecorder.onresume=()=>{
+        mainVideo.play();
+        isRecording=true;
+        stateBtn.className="fa fa-pause";
+        stateBtn.querySelector('span').textContent="Pause Recording";
+    }
+    mediaRecorder.ondataavailable=(e)=>chunck.push(e.data);
+
+    mediaRecorder.onstop=(e)=>{
+        isRecording=false;
+        mainVideo?.classList.add("hide");
+        videoGrid?.classList.remove("hide");
+        if(startBtn==null||stopBtn==null||stateBtn==null) return; 
+        startBtn.disabled=false
+        stopBtn.disabled=stateBtn.disabled=true
+        let blob=new Blob(chunck,{type:e.target.mimeType});
+        chunck=[]
+        createVideoContainer(URL.createObjectURL(blob))
+
+        audioStream.getTracks().forEach(track=>track.stop())
+        videoStream.getTracks().forEach(track=>track.stop())
+        stream.getTracks().forEach(track=>track.stop())
+    }
+
+    stateBtn.addEventListener('click',()=>{
+        if(isRecording===true)
+            mediaRecorder.pause();
+        else
+            mediaRecorder.resume();
+    })
+}
+
+function createVideoContainer(url)
+{
+    const videoContainer=document.getElementById("video-template").content.cloneNode(true);
+    videoContainer.querySelector('video').src=url;
+    videoContainer.querySelector('a').href=url;
+    videoGrid.append(videoContainer);
+}
+startBtn.addEventListener('click',handleStartRecording);
+stopBtn.addEventListener('click',()=>{
+    if(mediaRecorder!=null)
+        mediaRecorder.stop();
+});

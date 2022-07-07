@@ -4,190 +4,33 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body
-        {
-            overflow-x: hidden;
-            margin-bottom: 20vh;
-        }
-        #video
-        {
-            width: 100vw;
-            height: 80vh;
-            object-fit: contain;
-            border: 1px solid rgb(241, 231, 231);
-            border-radius: 5px;
-        }
-        .controls
-        {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-        }
-        .controls>*
-        {
-            margin: 2px;
-            flex-grow: 1;
-            padding: 5px;
-        }
-        button
-        {
-            font-size: 0.8rem;
-            border-radius: 10px;
-            border: 1px solid rgb(11, 11, 230);
-        }
-        #rec-video
-        {
-            display: flex;
-            justify-content: flex-start;
-            align-content: center;
-            margin: 10px;
-            padding: 10px;
-        }
-        #rec-video div
-        {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            justify-items: center;
-            text-align: center;
-            border-radius: 5px;
-            margin: 5px;
-        }
-        #rec-video video
-        {
-            display: block;
-            height:200px;
-            width: 300px;
-            object-fit: cover;
-        }
-        #rec-video a
-        {
-            background-color: blue;
-            color: white;
-            text-decoration: none;
-            padding: 2px 0px;
-        }
-        p
-        {
-            background-color: black;
-            color: white;
-            font-family:Georgia, 'Times New Roman', Times, serif;
-        }
-    </style>
-  <script type="text/javascript" defer>
-  window.addEventListener('DOMContentLoaded',()=>{
-        var pauseNode=document.getElementById("pause");
-        var timeNode=document.getElementById("time");
-        var resumeNode=document.getElementById("resume");
-        var time=0; var is_timecount=false;
-        function createPreviewVideo(videoSrc)
-        {
-            let recVideo=document.getElementById("rec-video");
-            let videoElement=document.createElement("video");
-            let previewDiv=document.createElement("div");
-            let downloadButton=document.createElement("a");
-            videoElement.src=videoSrc;
-            videoElement.controls=true;
-            videoElement.preload="metadata";
-            downloadButton.href=videoSrc;
-            downloadButton.text="Download";
-            downloadButton.download="record";
-            previewDiv.append(videoElement);
-            previewDiv.append(downloadButton);
-            recVideo.append(previewDiv);
-        }
-
-        const Share=()=>
-        { 
-            var startRec=document.getElementById("start");
-            var stopRec=document.getElementById("stop");
-            var video=document.getElementById("video");
-            navigator.mediaDevices.getDisplayMedia({video:true,audio:true}).then(stream=>{
-                video.srcObject=stream;
-                console.log(stream)
-                video.onloadedmetadata=()=>{
-                    video.play();
-                }
-            let chunks=[]
-            stream.oninactive=()=>console.log("inactive");
-            var mediaRecorder=new MediaRecorder(stream);
-            console.log(mediaRecorder)
-            document.querySelector("#start").onclick=()=>{
-                mediaRecorder.start();
-            }
-            document.getElementById("stop").onclick=()=>{
-                mediaRecorder.stop();
-                video.srcObject=null
-            };
-            pauseNode.addEventListener('click',()=>{
-                mediaRecorder.pause();
-            })
-            resumeNode.addEventListener('click',()=>{
-                mediaRecorder.resume();
-            })
-            mediaRecorder.onstart=()=>{
-                is_timecount=true;
-                startRec.disabled=true;
-                stopRec.disabled=false;
-                pauseNode.disabled=false;
-                resumeNode.disabled=true;
-            };
-            mediaRecorder.ondataavailable=(ev)=>chunks.push(ev.data);
-            mediaRecorder.onpause=()=>{
-                is_timecount=false;
-                resumeNode.disabled=false;
-                pauseNode.disabled=true;
-            }
-            mediaRecorder.onresume=()=>{
-                is_timecount=true;
-                resumeNode.disabled=true;
-                pauseNode.disabled=false;
-            }
-            mediaRecorder.onstop=()=>
-            {
-                is_timecount=false;
-                startRec.disabled=false;
-                stopRec.disabled=true;
-                pauseNode.disabled=true;
-                resumeNode.disabled=true;
-                var blob=new Blob(chunks,{type:"video/mp4"});
-                createPreviewVideo(URL.createObjectURL(blob));
-                chunks=[]
-            }
-            }).catch(err=>{
-                console.log(err);
-            })
-        }
-        document.getElementById("share").onclick=()=>{
-            Share();
-        }
-     
-        setInterval(()=>{
-            if(is_timecount==true)
-            {
-                time++;
-                timeNode.innerText=`${time} secs`;
-            }
-        },1000);
-    })
-  </script>
+    <title>Screen Recorder</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script defer src="./js/script.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <button id="share">Select Window To Record</button>
-        <button id="start">Start Recording</button>
-        <button id="pause" disabled>Pause Recording</button>
-        <button id="resume" disabled>Resume Recording</button>
-        <button id="stop" disabled>Stop Recording</button>
-        <p>
-            <i style="display: block;">Video Time</i>
-            <i id="time"></i>
-        </p>
-    </div> 
-    <div id="rec-video">
+    <div class="video-grid">
+        <h1>Your Video</h1>
+        <template id="video-template">
+            <div class="video-container">
+                <video  controls preload="metadatna"></video>
+                <a href="" download="recording">Download</a>
+            </div>
+        </template>
     </div>
-    <video  id="video"  ></video>
+    <video src="" id="main-video" class="hide" preload="auto">
+    </video>
+    <div class="controls">
+        <button id="start-button" class="fa fa-desktop"> 
+            <span>Start Recording</span>
+        </button>
+        <button id="state-button" class="fa fa-pause" disabled> 
+            <span>Pause Recording</span>
+        </button>
+        <button id="stop-button" class="fa fa-stop" disabled>
+            <span>Stop Recording</span>
+        </button>
+    </div>
 </body>
 </html>
