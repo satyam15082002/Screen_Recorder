@@ -13,12 +13,24 @@ async function handleStartRecording()
 {
     //Set audio and video stream;
     const videoStream=await navigator.mediaDevices.getDisplayMedia({video:true});
-    const audioStream=await navigator.mediaDevices.getUserMedia({audio:{
-        echoCancellation:true,noiseSuppression:true,sampleRate:44100
-    }})
-    if(!audioStream&&!videoStream)
+    let audioStream=null;
+    try
+    {
+        audioStream=await navigator.mediaDevices.getUserMedia({audio:{
+            echoCancellation:true,noiseSuppression:true,sampleRate:44100
+        }})
+    }
+    catch(e)
+    {
+        console.log(e.message)
+    }
+    if(!videoStream)
         return;
-    const stream=new MediaStream([...videoStream.getVideoTracks(),...audioStream.getAudioTracks()])
+    let stream=null;
+    if(audioStream)
+        stream=new MediaStream([...videoStream?.getVideoTracks(),...audioStream?.getAudioTracks()])
+    else
+        stream=new MediaStream([...videoStream.getTracks()])
     //Set main video stream
     mainVideo.srcObject=stream;
     mainVideo.muted=true;
@@ -59,8 +71,8 @@ async function handleStartRecording()
         chunck=[]
         createVideoContainer(URL.createObjectURL(blob))
 
-        audioStream.getTracks().forEach(track=>track.stop())
-        videoStream.getTracks().forEach(track=>track.stop())
+        audioStream?.getTracks().forEach(track=>track.stop())
+        videoStream?.getTracks().forEach(track=>track.stop())
         stream.getTracks().forEach(track=>track.stop())
     }
 
