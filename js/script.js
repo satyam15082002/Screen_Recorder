@@ -68,9 +68,8 @@ async function handleStartRecording()
         startBtn.disabled=false
         stopBtn.disabled=stateBtn.disabled=true
         let blob=new Blob(chunck,{type:e.target.mimeType});
-        chunck=[]
         createVideoContainer(URL.createObjectURL(blob))
-
+        chunck=[]
         audioStream?.getTracks().forEach(track=>track.stop())
         videoStream?.getTracks().forEach(track=>track.stop())
         stream.getTracks().forEach(track=>track.stop())
@@ -96,3 +95,10 @@ stopBtn.addEventListener('click',()=>{
     if(mediaRecorder!=null)
         mediaRecorder.stop();
 });
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./../sw.js')
+      .then(() => { console.log('Service Worker Registered'); });
+  }
+  

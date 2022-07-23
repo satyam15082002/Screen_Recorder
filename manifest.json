@@ -1,0 +1,20 @@
+{
+  "name": "Screen Recorder",
+  "short_name": "Recorder",
+  "start_url": "/index.html",
+  "background_color": "aliceblue",
+  "theme_color":"aliceblue",
+  "description": "It is simple web app that allow you to record your screen and download it.",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "./icon/recorder.svg",
+      "sizes": "any"
+    },
+    {
+      "src": "./icon/recorder.svg",
+      "sizes": "72x72 96x96 128x128 256x256"
+    }
+  ]
+
+}
