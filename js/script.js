@@ -96,9 +96,4 @@ stopBtn.addEventListener('click',()=>{
         mediaRecorder.stop();
 });
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register(location.href+'sw.js')
-      .then(() => { console.log('Service Worker Registered'); });
-  }
   
