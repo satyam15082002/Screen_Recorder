@@ -8,7 +8,7 @@ self.addEventListener('install', (e) => {
       './manifest.json',
       './css/font-awesome-4.7.0/css/font-awesome.css',
       './css/font-awesome-4.7.0/css/font-awesome.min.css',
-    //   '.css/font-awesome-4.7.0/fonts/fontawesome-webfont.svg'
+      './css/font-awesome-4.7.0/fonts/fontawesome-webfont.svg'
     ])),
   );
 });
