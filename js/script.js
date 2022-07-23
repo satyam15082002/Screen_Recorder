@@ -98,7 +98,7 @@ stopBtn.addEventListener('click',()=>{
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./../sw.js')
+      .register(location.href+'sw.js')
       .then(() => { console.log('Service Worker Registered'); });
   }
   
